@@ -1,0 +1,34 @@
+FROM mysql:5.5 
+######################################## UMLS PART #################################
+ARG MYSQL_DATABASE=umls
+ARG MYSQL_USER='root'@'localhost'
+ARG MYSQL_PASSWORD=''
+ARG MYSQL_ROOT_PASSWORD=''
+
+# The boolean variable MYSQL_ALLOW_EMPTY_PASSWORD are made true by setting them with any strings of nonzero 
+# lengths. Therefore, setting them to, for example, “0”, “false”, or “no” does not make them false, but 
+# actually makes them true. This is a known issue of the MySQL Server containers.
+ENV MYSQL_DATABASE=${MYSQL_DATABASE}
+ENV MYSQL_USER=${MYSQL_USER}
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=True
+ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
+ENV MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+
+RUN echo "Install perl"&&\
+    apt-get update && apt-get upgrade -y && \   
+    apt-get install build-essential -y && apt-get install perl nano -y && \
+    apt-get install libdbd-mysql-perl -y
+
+RUN echo "Install perl dependencies"&&\
+    cpan App::cpanminus &&\
+    cpanm Lingua::Stem &&\
+    cpanm Text::NSP &&\
+    cpanm Text::OverlapFinder &&\
+    cpanm -i Digest::SHA1
+
+ADD umls_init.sh /
+ADD create_database.sql /
+
+# Expose ports.
+EXPOSE 3306

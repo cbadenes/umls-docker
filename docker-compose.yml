@@ -1,0 +1,13 @@
+version: '3'
+services:
+  umls-db:
+    container_name: umlsdb
+    image: umls-mysql:latest
+    restart: unless-stopped
+    ports:
+     - 3306:3306
+    volumes:
+     - ./META:/META
+     - ./NET:/NET
+     - ./UMLS-Interface-1.51:/UMLS-Interface-1.51
+     - ./UMLS-Similarity-1.47:/UMLS-Similarity-1.47
